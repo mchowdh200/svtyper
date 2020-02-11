@@ -9,7 +9,14 @@ from svtyper.statistics import mean, stdev, median, upper_mad
 # VCF parsing tools
 # ==================================================
 def confidence_interval(var, tag, alt_tag, max_ci_dist):
-    ci = map(int, var.info[tag].split(','))
+    try:
+        ci = map(int, var.info[tag].split(','))
+    except KeyError as e:
+        if str(e) == 'CIPOS':
+            return [0, 0]
+        else:
+            raise
+        
     if ci[1] - ci[0] > max_ci_dist:
         return map(int, var.info[alt_tag].split(','))
     return ci
